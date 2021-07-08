@@ -1,28 +1,33 @@
 # DockerizedAngularApp
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.1.
+```
+# Stage 1: Compile and Build angular codebase
 
-## Development server
+# Use official node image as the base image
+FROM node:latest as build
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+# Set the working directory
+WORKDIR /usr/local/app
 
-## Code scaffolding
+# Add the source code to app
+COPY ./ /usr/local/app/
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# Install all the dependencies
+RUN npm install
 
-## Build
+# Generate the build of the application
+RUN npm run build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
-## Running unit tests
+# Stage 2: Serve app with nginx server
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+# Use official nginx image as the base image
+FROM nginx:latest
 
-## Running end-to-end tests
+# Copy the build output to replace the default nginx contents.
+COPY --from=build /usr/local/app/dist/dockerized-angular-app /usr/share/nginx/html
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+# Expose port 80
+EXPOSE 80
+```
 # angular-docker-poc
